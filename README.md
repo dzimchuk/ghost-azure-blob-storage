@@ -1,0 +1,1 @@
+# ghost-azure-blob-storage
