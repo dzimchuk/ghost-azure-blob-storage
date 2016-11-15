@@ -5,9 +5,9 @@ Azure Blob Storage adapter for Ghost 0.10+
 ## Installation
 
 ```
-npm install ghost-azure-blob-storage
-mkdir -p ./content/storage
-cp -r ./node_modules/ghost-azure-blob-storage ./content/storage/azure-blob-storage
+npm install ghost-azure-blob-storage --production
+mkdir .\content\storage\azure-blob-storage
+xcopy .\node_modules\ghost-azure-blob-storage .\content\storage\azure-blob-storage /E /Y
 ```
 
 ## Configuration
@@ -18,13 +18,22 @@ In your config.js file, you'll need to add a new `storage` block to whichever en
 storage: {
   active: 'azure-blob-storage',
   'azure-blob-storage': {
-    connectionString: 'your storage account connection string', // if not found, the module will try to use 'AZURE_STORAGE_CONNECTION_STRING' environment variable
+    connectionString: 'your storage account connection string',
     container: 'your container name', // lowercase, 3-63 characters, only letters, numbers or dashes (-), default is 'ghost'
-    cdnUrl: 'your CDN endpoint', // optional
+    cdn: 'your CDN endpoint', // optional
     useHttps: true|false // use https CDN endpoint, optional, default is 'false'
   }
 }
 ```
+
+The following environment variables can be used to provide values for the above settings:
+
+- storage_connectionString or AZURE_STORAGE_CONNECTION_STRING
+- storage_container
+- storage_cdn
+- storage_use_https
+
+Environment variables take precedence over config.js values and defaults.
 
 ## License
 

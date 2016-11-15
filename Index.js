@@ -21,15 +21,14 @@ function AzureBlobStore(config) {
     BaseStore.call(this);
 
     options = config || {};
-    options.connectionString = options.connectionString || process.env.AZURE_STORAGE_CONNECTION_STRING;
-    options.container = options.container || 'ghost';
-    options.useHttps = options.useHttps == true;
+    options.connectionString = process.env.storage_connectionString || process.env.AZURE_STORAGE_CONNECTION_STRING || options.connectionString;
+    options.container = process.env.storage_container || options.container || 'ghost';
+    options.cdn = process.env.storage_cdn || options.cdn;
+    options.useHttps = (process.env.storage_use_https || options.useHttps || 'false' == 'true');
 }
 
 util.inherits(AzureBlobStore, BaseStore);
 
-// - image is the express image object
-// - returns a promise which ultimately returns the full url to the uploaded image
 AzureBlobStore.prototype.save = function (image, targetDir) {
     targetDir = targetDir || this.getTargetDir();
     
@@ -58,13 +57,13 @@ AzureBlobStore.prototype.save = function (image, targetDir) {
     .then(function () {
         var blobUrl = blobService.getUrl(blobName);
         
-        if(!options.cdnUrl) {
+        if(!options.cdn) {
             return blobUrl;
         }
 
         var parsedUrl = url.parse(blobUrl, true, true);
         var protocol = (options.useHttps ? "https" : "http") + "://";
-        return protocol + options.cdnUrl  + parsedUrl.path;
+        return protocol + options.cdn  + parsedUrl.path;
     });
 };
 
