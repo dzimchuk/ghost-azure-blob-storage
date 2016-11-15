@@ -3,7 +3,6 @@ var Promise = require('bluebird'),
     url = require('url'),
     path = require('path'),
     BlobService = require('./lib/blobService.js'),
-    config = require('../../../core/server/config'),
     BaseStore = require('../../../core/server/storage/base'),
     options = {},
     mimeTypes = {
@@ -32,7 +31,7 @@ util.inherits(AzureBlobStore, BaseStore);
 // - image is the express image object
 // - returns a promise which ultimately returns the full url to the uploaded image
 AzureBlobStore.prototype.save = function (image, targetDir) {
-    targetDir = targetDir || this.getTargetDir(config.getContentPath('images'));
+    targetDir = targetDir || this.getTargetDir();
     
     var blobService = new BlobService(options);
     var blobName;
@@ -40,10 +39,10 @@ AzureBlobStore.prototype.save = function (image, targetDir) {
     return this.getUniqueFileName(this, image, targetDir).then(function (filename) {
         blobName = filename;
         var blobOptions = {
-            contentSettings = {
+            contentSettings: {
                 cacheControl: 'public, max-age=31536000'
             }
-        }
+        };
         
         var ext = path.extname(image.name);
         if (ext) {
@@ -54,7 +53,9 @@ AzureBlobStore.prototype.save = function (image, targetDir) {
         }
 
         return blobService.createBlockBlobFromLocalFileAsync(blobName, image.path, blobOptions);
-    }).then(function () {
+    })
+    .delay(500)
+    .then(function () {
         var blobUrl = blobService.getUrl(blobName);
         
         if(!options.cdnUrl) {
@@ -64,18 +65,12 @@ AzureBlobStore.prototype.save = function (image, targetDir) {
         var parsedUrl = url.parse(blobUrl, true, true);
         var protocol = (options.useHttps ? "https" : "http") + "://";
         return protocol + options.cdnUrl  + parsedUrl.path;
-    }).catch(function (e) {
-        console.error('Error', e);
-        return Promise.reject(e);
     });
 };
 
-AzureBlobStore.prototype.exists = function (fileName) {
+AzureBlobStore.prototype.exists = function (blobName) {
     var blobService = new BlobService(options);
-    return blobService.doesBlobExist(fileName).catch(function (e) {
-        console.error('Error', e);
-        return Promise.reject(e);
-    });
+    return blobService.doesBlobExist(blobName);
 };
 
 AzureBlobStore.prototype.serve = function() {
@@ -85,14 +80,11 @@ AzureBlobStore.prototype.serve = function() {
 };
 
 AzureBlobStore.prototype.delete = function (fileName, targetDir) {
-    targetDir = targetDir || this.getTargetDir(config.getContentPath('images'));
-    var pathToDelete = path.join(targetDir, fileName);
+    targetDir = targetDir || this.getTargetDir();
+    var blobName = path.join(targetDir, fileName);
 
     var blobService = new BlobService(options);
-    return blobService.doesBlobExist(pathToDelete).catch(function (e) {
-        console.error('Error', e);
-        return Promise.reject(e);
-    });
+    return blobService.delete(blobName);
 };
 
 module.exports = AzureBlobStore;
