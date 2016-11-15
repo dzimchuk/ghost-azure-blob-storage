@@ -17,7 +17,7 @@ In your config.js file, you'll need to add a new `storage` block to whichever en
 ```
 storage: {
   active: 'azure-blob-storage',
-  azure-blob-storage: {
+  'azure-blob-storage': {
     connectionString: 'your storage account connection string', // if not found, the module will try to use 'AZURE_STORAGE_CONNECTION_STRING' environment variable
     container: 'your container name', // lowercase, 3-63 characters, only letters, numbers or dashes (-), default is 'ghost'
     cdnUrl: 'your CDN endpoint', // optional
