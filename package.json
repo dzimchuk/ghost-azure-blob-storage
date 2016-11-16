@@ -1,6 +1,6 @@
 {
   "name": "ghost-azure-blob-storage",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Ghost image storage adapter for Azure Blob Storage",
   "main": "Index.js",
   "scripts": {

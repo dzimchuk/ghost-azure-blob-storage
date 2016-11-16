@@ -23,8 +23,7 @@ function AzureBlobStore(config) {
     options = config || {};
     options.connectionString = process.env.storage_connectionString || process.env.AZURE_STORAGE_CONNECTION_STRING || options.connectionString;
     options.container = process.env.storage_container || options.container || 'ghost';
-    options.cdn = process.env.storage_cdn || options.cdn;
-    options.useHttps = (process.env.storage_use_https || options.useHttps || 'false' == 'true');
+    options.cdnUrl = process.env.storage_cdnUrl || options.cdnUrl;
 }
 
 util.inherits(AzureBlobStore, BaseStore);
@@ -57,13 +56,12 @@ AzureBlobStore.prototype.save = function (image, targetDir) {
     .then(function () {
         var blobUrl = blobService.getUrl(blobName);
         
-        if(!options.cdn) {
+        if(!options.cdnUrl) {
             return blobUrl;
         }
 
         var parsedUrl = url.parse(blobUrl, true, true);
-        var protocol = (options.useHttps ? "https" : "http") + "://";
-        return protocol + options.cdn  + parsedUrl.path;
+        return options.cdnUrl  + parsedUrl.path;
     });
 };
 
