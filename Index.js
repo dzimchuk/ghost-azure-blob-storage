@@ -5,6 +5,7 @@ var Promise = require('bluebird'),
     BlobService = require('./lib/blobService.js'),
     BaseStore = require('../../../core/server/storage/base'),
     options = {},
+    blobUrlPattern = {},
     mimeTypes = {
         '.jpg':  'image/jpeg',
         '.jpe':  'image/jpeg',
@@ -24,6 +25,8 @@ function AzureBlobStore(config) {
     options.connectionString = process.env.storage_connectionString || process.env.AZURE_STORAGE_CONNECTION_STRING || options.connectionString;
     options.container = process.env.storage_container || options.container || 'ghost';
     options.cdnUrl = process.env.storage_cdnUrl || options.cdnUrl;
+
+    blobUrlPattern = new RegExp('^.*/' + options.container + '(/.+)$');
 }
 
 util.inherits(AzureBlobStore, BaseStore);
@@ -61,7 +64,13 @@ AzureBlobStore.prototype.save = function (image, targetDir) {
         }
 
         var parsedUrl = url.parse(blobUrl, true, true);
-        return options.cdnUrl  + parsedUrl.path;
+        
+        var match = blobUrlPattern.exec(parsedUrl.path);
+        if (match == null) {
+            return blobUrl;
+        }
+
+        return url.resolve(options.cdnUrl, match[1]);
     });
 };
 
