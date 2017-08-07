@@ -1,9 +1,10 @@
-var Promise = require('bluebird'),
-    util = require('util'),
+'use strict';
+
+var BaseAdapter = require('ghost-storage-base'),
+    Promise = require('bluebird'),
     url = require('url'),
     path = require('path'),
     BlobService = require('./lib/blobService.js'),
-    BaseStore = require('../../../core/server/storage/base'),
     options = {},
     blobUrlPattern = {},
     mimeTypes = {
@@ -18,26 +19,33 @@ var Promise = require('bluebird'),
         '.tiff': 'image/tiff'
     };
 
-function AzureBlobStore(config) {
-    BaseStore.call(this);
+class AzureBlobStorageAdapter extends BaseAdapter{
+  constructor(config) {
+    super();
 
     options = config || {};
-    options.connectionString = process.env.storage_connectionString || process.env.AZURE_STORAGE_CONNECTION_STRING || options.connectionString;
+    options.connectionString = process.env.storage_connectionString || options.connectionString;
     options.container = process.env.storage_container || options.container || 'ghost';
     options.cdnUrl = process.env.storage_cdnUrl || options.cdnUrl;
 
     blobUrlPattern = new RegExp('^.*/' + options.container + '(/.+)$');
-}
+  }
+  
+  exists(fileName, targetDir) {
+    targetDir = targetDir || this.getTargetDir();
+    var blobName = path.join(targetDir, fileName);
 
-util.inherits(AzureBlobStore, BaseStore);
+    var blobService = new BlobService(options);
+    return blobService.doesBlobExist(blobName);
+  }
 
-AzureBlobStore.prototype.save = function (image, targetDir) {
+  save(image, targetDir) {
     targetDir = targetDir || this.getTargetDir();
     
     var blobService = new BlobService(options);
     var blobName;
 
-    return this.getUniqueFileName(this, image, targetDir).then(function (filename) {
+    return this.getUniqueFileName(image, targetDir).then(function (filename) {
         blobName = filename;
         var blobOptions = {
             contentSettings: {
@@ -72,25 +80,21 @@ AzureBlobStore.prototype.save = function (image, targetDir) {
 
         return url.resolve(options.cdnUrl, match[1]);
     });
-};
+  }
 
-AzureBlobStore.prototype.exists = function (blobName) {
-    var blobService = new BlobService(options);
-    return blobService.doesBlobExist(blobName);
-};
-
-AzureBlobStore.prototype.serve = function() {
-    return function (req, res, next) {
+  serve() {
+    return function customServe(req, res, next) {
       next();
-    };
-};
+    }
+  }
 
-AzureBlobStore.prototype.delete = function (fileName, targetDir) {
-    targetDir = targetDir || this.getTargetDir();
-    var blobName = path.join(targetDir, fileName);
+  delete() {
+    return Promise.reject('not implemented');
+  }
 
-    var blobService = new BlobService(options);
-    return blobService.delete(blobName);
-};
+  read() {
+    return Promise.reject('not implemented');
+  }
+}
 
-module.exports = AzureBlobStore;
+module.exports = AzureBlobStorageAdapter;

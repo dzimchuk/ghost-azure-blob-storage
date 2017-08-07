@@ -1,7 +1,7 @@
 {
   "name": "ghost-azure-blob-storage",
-  "version": "1.0.2",
-  "description": "Ghost image storage adapter for Azure Blob Storage",
+  "version": "2.0.0",
+  "description": "Ghost 1.x image storage adapter for Azure Blob Storage",
   "main": "Index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -21,7 +21,8 @@
     "storage"
   ],
   "dependencies": {
-    "azure-storage": "^1.3.2",
-    "bluebird": "3.4.6"
+    "azure-storage": "2.2.2",
+    "bluebird": "3.5.0",
+    "ghost-storage-base": "0.0.1"
   }
 }
