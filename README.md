@@ -5,9 +5,15 @@
 ### Windows
 
 ```
+ghost stop
+
 mkdir .\content\adapters\storage\azure-blob-storage
 cd .\content\adapters\storage\azure-blob-storage
 npm install ghost-azure-blob-storage --production
+xcopy .\node_modules\ghost-azure-blob-storage\*.* . /E /Y
+
+cd ../../../..
+ghost start
 ```
 
 ## Configuration
