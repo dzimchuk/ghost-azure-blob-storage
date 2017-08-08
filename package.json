@@ -1,6 +1,6 @@
 {
   "name": "ghost-azure-blob-storage",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Ghost 1.x image storage adapter for Azure Blob Storage",
   "main": "Index.js",
   "scripts": {
@@ -21,8 +21,8 @@
     "storage"
   ],
   "dependencies": {
-    "azure-storage": "2.2.2",
-    "bluebird": "3.5.0",
-    "ghost-storage-base": "0.0.1"
+    "azure-storage": "~2.2.2",
+    "bluebird": "^3.5.0",
+    "ghost-storage-base": "^0.0.1"
   }
 }
