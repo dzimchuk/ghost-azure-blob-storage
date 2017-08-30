@@ -5,15 +5,22 @@
 ### Windows
 
 ```
-ghost stop
+cd /your/ghost/directory
 
 mkdir .\content\adapters\storage\azure-blob-storage
 cd .\content\adapters\storage\azure-blob-storage
 npm install ghost-azure-blob-storage --production
 xcopy .\node_modules\ghost-azure-blob-storage\*.* . /E /Y
+```
 
-cd ../../../..
-ghost start
+### Linux
+```
+cd /var/www/ghost
+
+mkdir -p ./content/adapters/storage/azure-blob-storage
+cd ./content/adapters/storage/azure-blob-storage
+npm install ghost-azure-blob-storage --production
+cp -favr node_modules/ghost-azure-blob-storage/* .
 ```
 
 ## Configuration
@@ -30,6 +37,7 @@ In your config.{env}.json file, you'll need to add a new `storage` block:
   }
 }
 ```
+
 ### CDN
 
 If you use CDN you need to make sure that it points to the container and not to the storage account base URL as the adapter will omit the container name when constructing the resulting image URL.
